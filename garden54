@@ -1,0 +1,87 @@
+
+  // Define the Card class
+  class Card {
+    constructor(suit, rank) {
+      this.suit = suit;
+      this.rank = rank;
+    }
+
+    rankName() {
+      const ranks = {1: "A", 11: "J", 12: "Q", 13: "K"};
+      return ranks[this.rank] || this.rank.toString();
+    }
+  }
+
+  // Define the Deck class
+  class Deck {
+    constructor() {
+      this.cards = [];
+      for (let suit of ['Hearts', 'Diamonds', 'Clubs', 'Spades']) {
+        for (let rank = 1; rank <= 13; rank++) {
+          this.cards.push(new Card(suit, rank));
+        }
+      }
+      this.shuffle();
+    }
+
+    shuffle() {
+      for (let i = this.cards.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [this.cards[i], this.cards[j]] = [this.cards[j], this.cards[i]];
+      }
+    }
+
+    dealCard() {
+      return this.cards.pop();
+    }
+  }
+
+  // Initialize the deck
+  const deck = new Deck();
+
+  // Initialize the board
+  const boardElement = document.getElementById('board');
+  const centerIndex = 3;
+  const center = [centerIndex, centerIndex];
+  const directions = [[-1, 0], [1, 0], [0, -1], [0, 1]]; // Up, down, left, right
+
+  for (let i = 0; i < 7; i++) {
+    for (let j = 0; j < 7; j++) {
+      const tileElement = document.createElement('div');
+      tileElement.classList.add('tile');
+      if (i === centerIndex && j === centerIndex) {
+        tileElement.textContent = 'Deck';
+        tileElement.addEventListener('click', () => {
+          if (tileElement.classList.contains('highlighted')) {
+            const card = deck.dealCard();
+            const cardText = `${card.rankName()} of ${card.suit}`;
+            const cardElement = document.createElement('div');
+            cardElement.classList.add('tile');
+            cardElement.textContent = cardText;
+            boardElement.appendChild(cardElement);
+            tileElement.classList.remove('highlighted');
+            messageElement.textContent = 'Next turn';
+          }
+        });
+      } else {
+        const distToCenter = Math.abs(i - centerIndex) + Math.abs(j - centerIndex);
+        if (distToCenter <= 1) {
+          const card = deck.dealCard();
+          const cardText = `${card.rankName()} of ${card.suit}`;
+          tileElement.textContent = cardText;
+        }
+      }
+      boardElement.appendChild(tileElement);
+    }
+  }
+
+  // Display message
+  const messageElement = document.getElementById('message');
+  messageElement.addEventListener('click', () => {
+    messageElement.textContent = '';
+    const deckTile = document.querySelector('.board > .tile');
+    deckTile.classList.add('highlighted');
+  });
+</script>
+</body>
+</html>
